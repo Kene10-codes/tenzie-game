@@ -6,18 +6,43 @@ import { nanoid } from 'nanoid'
 
 function App() {
   const [dice, setDice] = useState(allNewDice)
+  const [time, setTime] = useState("")
   const [tenzies, setTenzies] = useState(false)
+  const [num, setNumber] = useState({
+    number: 0
+  })
 
   useEffect(() => {
-    console.log("tenzies changes")
       const allHeldDice = dice.every(die => die.isHeld)
       const firstDiceValue = dice[0].value
       const allSameValue = dice.every(die => die.value === firstDiceValue)
       if(allHeldDice && allSameValue) {
         setTenzies(true)
-        console.log("You won the game")
       }
   }, [dice])
+
+  useEffect(() => {
+       setNumber(num => {
+         return {
+           ...num,
+           number: num.number + 1
+         }
+       })
+  }, [dice])
+
+
+  useEffect(() => { 
+    console.log("changed")
+    setTimeout(function() {
+      const today = new Date();
+      // let h = today.getHours();
+      let m = today.getMinutes();
+      let s = today.getSeconds();
+      setTime(m + " " + s)
+    }, 1000);      
+
+    
+  }, [tenzies])
 
   function generateNewDie() {
       return {
@@ -36,11 +61,8 @@ function App() {
   }
 
   function holdDice(id) {
-    console.log(id)
     setDice(oldDice => {
-      console.log(oldDice)
       return oldDice.map(die => {
-        console.log(die)
         return die.id === id ? {...die, isHeld: !die.isHeld} : die
       })
     })
@@ -51,6 +73,8 @@ function App() {
 
   function rollDice() {
     if(!tenzies) {
+      // startTime()
+      // setTime(time)
       setDice(oldDice => oldDice.map(die => die.isHeld ? die : generateNewDie()
       ))
     } else {
@@ -59,12 +83,15 @@ function App() {
     }
   
 }
+
   return (
        <main>
          { tenzies  && <Confetti
          /> }
             <h1 className="dice--title">Tenzies</h1>
+            <span>Time of game: {time}</span>
             <p className="dice--instructions">Roll until all dice are the same. Click each die to freeze it at its current value between rolls.</p>
+            <p className='dice--rolltext' >No of rolls: <span className='dice-rollnumber'>{num.number}</span></p>
             <div className='dice--container'>
               {diceElement}
             </div>
